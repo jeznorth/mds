@@ -1,16 +1,11 @@
 #!make
 
-ifeq ($(OS),Windows_NT)
-
-ifneq ($(strip $(filter %sh,$(basename $(realpath $(SHELL))))),)
+ifneq ($(OS),Windows_NT)
 POSIXSHELL := 1
+KC_HOST_ENTRY := $(shell grep "keycloak" /etc/hosts)
 else
 POSIXSHELL :=
-endif
-
-else
-# not on windows:
-POSIXSHELL := 1
+KC_HOST_ENTRY := $(shell findstr "keycloak" C:\Windows\System32\drivers\etc\hosts)
 endif
 
 local-dev: one-time-local-dev-env-setup
@@ -21,32 +16,36 @@ database: database-build | database-run
 frontend: frontend-build | frontend-run
 project: project-build | project-run
 rebuild: project-build
-reset:	stop | clean
+reset:  stop | clean
 database-seed: database-dump | database-dump-seed
 database-seed-local: database-dump | database-dump-seed-local
 
 start-logstash:
-	@echo "+\n++ This will start elasticsearch's logstash\n"
-	@echo "++ based off the /elastic/logstash/pipeline/mds.logstash.conf file \n"
-	@echo "++ You need to configure this mds.logstash.conf file first.\n+"
+	@echo "+\n++ This will start elasticsearch's logstash"
+	@echo "++ based off the /elastic/logstash/pipeline/mds.logstash.conf file"
+	@echo "++ You need to configure this mds.logstash.conf file first."
 	@echo "++ [CTRL]-[C] to exit ...\n+"
 	@logstash -f elastic/logstash/pipeline/mds.logstash.conf
 
 one-time-local-dev-env-setup:
-	@echo "+\n++ Setting up your local development environment\n"
-	@echo "++ with local authentication and db.  Run this once only.\n"
-	@echo "++ Your last configuration was saved to *-last-backup ...\n+"
-
+	@echo "+\n++ Setting up your local development environment"
+	@echo "++ with local authentication and db.  Run this once only."
+	@echo "++ Your last configuration files were saved with the ending '*-last-backup'."
 ifneq ($(POSIXSHELL),)
-	@[ ! -f ./elastic/.env ] ||cp ./elastic/.env ./elastic/.env-last-backup
+ifeq ($(KC_HOST_ENTRY),)
+	@echo "++ Adding required keycloak entry to hosts file:"
+	@echo "127.0.0.1       localhost       keycloak" | sudo tee -a /etc/hosts;
+endif
+	@[ ! -f ./elastic/.env ] || cp ./elastic/.env ./elastic/.env-last-backup
 	@cp ./elastic/.env-sample ./elastic/.env
-	@[ ! -f ./frontend/.env ] ||cp ./frontend/.env ./frontend/.env-last-backup
+	@[ ! -f ./frontend/.env ] || cp ./frontend/.env ./frontend/.env-last-backup
 	@cp ./frontend/.env-dev-local-keycloak ./frontend/.env
 	@[ ! -f "./frontend/src/constants/environment.js" ] || cp ./frontend/src/constants/environment.js ./frontend/src/constants/environment.js-last-backup
 	@cp ./frontend/src/constants/environment.js-dev-local-keycloak ./frontend/src/constants/environment.js
 	@[ ! -f "./python-backend/.env" ] || cp ./python-backend/.env ./python-backend/.env-last-backup
 	@cp ./python-backend/.env-dev-local-keycloak ./python-backend/.env
 else
+	@if "$(KC_HOST_ENTRY)" GTR "" (echo "hosts entry already exists") else (echo 127.0.0.1        localhost       keycloak >> C:\Windows\System32\drivers\etc\hosts)
 	@if exist .\elastic\.env copy /Y .\elastic\.env .\elastic\.env-last-backup
 	@copy /Y .\elastic\.env-sample .\elastic\.env
 	@if exist .\frontend\.env copy /Y .\frontend\.env .\frontend\.env-last-backup
@@ -56,7 +55,7 @@ else
 	@if exist .\python-backend\.env copy .\python-backend\.env .\python-backend\.env-last-backup
 	@copy /Y .\python-backend\.env-dev-local-keycloak .\python-backend\.env
 endif
-	
+	@echo "+"
 
 restore-last-env:
 	@echo "+\n++ Restoring your environment from last backup...\n+"
@@ -66,7 +65,7 @@ restore-last-env:
 
 pause-30:
 	@echo "+\n++ Pausing 30 seconds\n+"
-ifneq ($(POSIXSHELL),)	
+ifneq ($(POSIXSHELL),)  
 	@sleep 30
 else
 	@timeout 30
