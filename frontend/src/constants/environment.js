@@ -32,3 +32,14 @@ export const USER_ROLES = {
   role_create: "mds-mine-create",
   role_view: "mds-mine-view",
 };
+
+// export const SSO_LOGOUT_REDIRECT_URI = `${window.location.origin}/return-page?type=${
+//   RETURN_PAGE_TYPE.LOGOUT
+// }`;
+// export const SSO_LOGOUT_ENDPOINT = `${SSO_BASE_AUTH_ENDPOINT}/logout?redirect_uri=${SSO_LOGOUT_REDIRECT_URI}`;
+
+// export const SITEMINDER_BASE_URL = "https://logontest.gov.bc.ca";
+// export const SITEMINDER_LOGOUT_REDIRECT_URI = `${window.location.origin}/return-page?type=${
+//   RETURN_PAGE_TYPE.SITEMINDER_LOGOUT
+// }`;
+// export const SITEMINDER_LOGOUT_ENDPOINT = `${SITEMINDER_BASE_URL}/clp-cgi/logoff.cgi?returl=${SITEMINDER_LOGOUT_REDIRECT_URI}&retnow=1`;
