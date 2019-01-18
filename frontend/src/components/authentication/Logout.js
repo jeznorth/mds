@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { logoutUser } from "@/actions/authenticationActions";
 import { getKeycloak } from "@/selectors/authenticationSelectors";
-
+import { signOutFromSSO } from "@/utils/authentication";
 /**
  * @class Logout.js is a small component which contains all keycloak logic to log a user out, NOTE: due to idir issues, Logout does not work as it should.
  */
@@ -17,9 +17,10 @@ const propTypes = {
 
 export class Logout extends Component {
   handleLogout = () => {
-    this.props.keycloak.logout();
+    // this.props.keycloak.logout();
     localStorage.removeItem("jwt");
     this.props.logoutUser();
+    signOutFromSSO();
   };
 
   render() {

@@ -5,6 +5,7 @@ import MineDashboard from "@/components/mine/MineDashboard";
 import PartyProfile from "@/components/parties/PartyProfile";
 import RelationshipProfile from "@/components/parties/RelationshipProfile";
 import AdminDashboard from "@/components/admin/AdminDashboard";
+import ReturnPage from "@/components/authentication/ReturnPage";
 
 export const DASHBOARD = {
   route: "/",
@@ -43,4 +44,9 @@ export const RELATIONSHIP_PROFILE = {
 export const ADMIN_DASHBOARD = {
   route: "/admin/dashboard",
   component: AdminDashboard,
+};
+
+export const RETURN_PAGE = {
+  route: "/return-page",
+  component: ReturnPage,
 };
